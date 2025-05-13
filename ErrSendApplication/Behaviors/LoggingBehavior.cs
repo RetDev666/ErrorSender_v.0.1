@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using ErrSendApplication.Interfaces;
+using MediatR;
 using Serilog;
 
 namespace ErrSendApplication.Behaviors

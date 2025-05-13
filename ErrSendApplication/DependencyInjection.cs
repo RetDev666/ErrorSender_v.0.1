@@ -1,4 +1,6 @@
-﻿using ErrSendApplication.Behaviors;
+﻿using ErrSendApplication.Authorization;
+using ErrSendApplication.Behaviors;
+using ErrSendApplication.Proceses;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +17,12 @@ namespace ErrSendApplication
             services.AddValidatorsFromAssemblies(new[] { Assembly.GetExecutingAssembly() });
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+
+            //Реєстрація авторизації
+            services.AddScoped<IAuthorizationService, ApiKeyAuthorizationService>();
+
+            //Реєстрація процесів
+            services.AddScoped<IErrorProcessor, ErrorProcessor>();
 
             return services;
         }
