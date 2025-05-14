@@ -17,17 +17,14 @@ namespace ErrSendApplication.Authorization
             if (string.IsNullOrEmpty(apiKey))
                 return Task.FromResult(false);
 
-            // Отримуємо масив API ключів з конфігурації
+            // Get the array of API keys from the configuration
             var apiKeysSection = configuration.GetSection("ApiKeys");
             var validApiKeys = new List<string>();
 
-            // Ітеруємося по всіх елементах секції
-            for (int i = 0; ; i++)
+            // Iterate through all elements in the section
+            foreach (var child in apiKeysSection.GetChildren())
             {
-                var key = apiKeysSection.GetValue<string>($"{i}");
-                if (key == null)
-                    break;
-                validApiKeys.Add(key);
+                validApiKeys.Add(child.Value);
             }
 
             return Task.FromResult(validApiKeys.Contains(apiKey));

@@ -56,8 +56,9 @@ namespace ErrSendPersistensTelegram.Services
 
                 var message = FormatErrorMessage(error);
 
+
                 await botClient.SendTextMessageAsync(
-                    chatId: chatId,
+                    chatId: long.Parse(chatId), 
                     text: message,
                     parseMode: ParseMode.Html
                 );
