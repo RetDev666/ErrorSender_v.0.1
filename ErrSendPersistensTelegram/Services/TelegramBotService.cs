@@ -86,7 +86,7 @@ namespace ErrSendPersistensTelegram.Services
             if (!string.IsNullOrEmpty(error.Environment))
                 sb.AppendLine($"<b>🖥 Середовище:</b> {HtmlEncode(error.Environment)}");
 
-            sb.AppendLine($"<b>⏱ Час:</b> {error.Timestamp:yyyy-MM-dd HH:mm:ss}");
+            sb.AppendLine($"<b>⏱ Час:</b> {error.Time:yyyy-MM-dd HH:mm:ss}");
             sb.AppendLine();
             sb.AppendLine($"<b>❌ Повідомлення:</b> {HtmlEncode(error.Message)}");
 

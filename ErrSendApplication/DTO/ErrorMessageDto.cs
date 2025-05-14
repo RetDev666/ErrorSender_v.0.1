@@ -18,7 +18,7 @@ namespace ErrSendApplication.DTO
         public string StackTrace { get; set; }
         public string AdditionalData { get; set; }
         public DateTime Time { get; set; }
-
+        public object Timestamp { get; private set; }
 
         public void Mapping (Profile profile)
         {

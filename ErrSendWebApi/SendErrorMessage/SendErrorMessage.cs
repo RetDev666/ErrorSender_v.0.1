@@ -4,7 +4,7 @@ using ErrSendPersistensTelegram.Services;
 using FluentValidation;
 using MediatR;
 
-namespace ErrSendApplication.Features.Telegram
+namespace ErrSendWebApi.SendErrorMessage
 {
     public class SendErrorMessage
     {

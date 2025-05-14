@@ -1,6 +1,7 @@
 ﻿using ErrSendApplication.Authorization;
 using ErrSendApplication.Behaviors;
 using ErrSendApplication.Proceses;
+using ErrSendApplication.Processes;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Configuration;

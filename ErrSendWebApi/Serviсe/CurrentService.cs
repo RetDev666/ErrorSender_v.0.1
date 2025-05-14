@@ -1,4 +1,4 @@
-﻿using ErrSendApplication.Interfaces;
+﻿using ErrSendApplication;
 
 namespace ErrSendWebApi.Serviсe
 {

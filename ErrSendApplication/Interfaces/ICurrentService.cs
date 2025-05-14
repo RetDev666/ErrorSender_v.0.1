@@ -1,4 +1,4 @@
-﻿namespace ErrSendApplication.Interfaces
+﻿namespace ErrSendApplication
 {
     public interface ICurrentService
     {

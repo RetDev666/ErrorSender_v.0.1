@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.Extensions.Configuration;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 
 namespace ErrSendApplication.Authorization
 {
     public class ApiKeyAuthorizationService : IAuthorizationService
     {
-        private readonly IConfiguration _configuration;
+        private readonly IConfiguration configuration;
 
         public ApiKeyAuthorizationService(IConfiguration configuration)
         {
-            _configuration = configuration;
+            this.configuration = configuration;
         }
 
         public Task<bool> ValidateApiKeyAsync(string apiKey)
@@ -22,7 +17,19 @@ namespace ErrSendApplication.Authorization
             if (string.IsNullOrEmpty(apiKey))
                 return Task.FromResult(false);
 
-            var validApiKeys = _configuration.GetSection("ApiKeys").Get<List<string>>() ?? new List<string>();
+            // Отримуємо масив API ключів з конфігурації
+            var apiKeysSection = configuration.GetSection("ApiKeys");
+            var validApiKeys = new List<string>();
+
+            // Ітеруємося по всіх елементах секції
+            for (int i = 0; ; i++)
+            {
+                var key = apiKeysSection.GetValue<string>($"{i}");
+                if (key == null)
+                    break;
+                validApiKeys.Add(key);
+            }
+
             return Task.FromResult(validApiKeys.Contains(apiKey));
         }
 

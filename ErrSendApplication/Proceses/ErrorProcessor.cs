@@ -6,22 +6,25 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Domain.Models;
 using ErrSendApplication.Proceses;
+using Microsoft.Extensions.Logging;
 using Serilog;
 
 namespace ErrSendApplication.Processes
 {
     public class ErrorProcessor : IErrorProcessor
     {
-        private readonly ILogger<ErrorProcessor> _logger;
+        private readonly ILogger<ErrorProcessor> logger;
 
         public ErrorProcessor(ILogger<ErrorProcessor> logger)
         {
-            _logger = logger;
+            this.logger = logger;
         }
+
+        public ILogger<ErrorProcessor> Logger => logger;
 
         public async Task<ErrorMessage> ProcessErrorAsync(ErrorMessage error)
         {
-            _logger.LogInformation($"Processing error from {error.Application}");
+            Logger.LogInformation($"Processing error from {error.Application}");
 
             // Додаткова обробка помилки
             if (string.IsNullOrEmpty(error.Environment))
@@ -57,19 +60,19 @@ namespace ErrSendApplication.Processes
         {
             if (error == null)
             {
-                _logger.LogWarning("Error message is null");
+                Logger.LogWarning("Error message is null");
                 return false;
             }
 
             if (string.IsNullOrEmpty(error.Application))
             {
-                _logger.LogWarning("Application name is required");
+                Logger.LogWarning("Application name is required");
                 return false;
             }
 
             if (string.IsNullOrEmpty(error.Message))
             {
-                _logger.LogWarning("Error message is required");
+                Logger.LogWarning("Error message is required");
                 return false;
             }
 
