@@ -169,9 +169,6 @@ curl -X POST http://localhost:5001/api/Telegram/SendError \
 - **ErrSendPersistensTelegram** - інтеграція з Telegram
 - **ErrSendWebApi** - REST API та конфігурація
 
-## Автори
-
-- [Ваше_Ім'я] - Initial work
 
 ## Ліцензія
 
