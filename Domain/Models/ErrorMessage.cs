@@ -8,37 +8,37 @@
         /// <summary>
         /// Назва додатку, в якому виникла помилка
         /// </summary>
-        public string Application { get; set; }
+        public required string Application { get; set; }
        
         /// <summary>
         /// Версія додатку
         /// </summary>
-        public string Version { get; set; }
+        public required string Version { get; set; }
         
         /// <summary>
         /// Середовище виконання (Development, Production)
         /// </summary>
-        public string Environment { get; set; }
+        public required string Environment { get; set; }
         
         /// <summary>
         /// Повідомлення про помилку
         /// </summary>
-        public string Message { get; set; }
+        public required string Message { get; set; }
         
         /// <summary>
         /// Стек виклику 
         /// <summary>
-        public string StackTrace { get; set; }
+        public required string StackTrace { get; set; }
 
         /// <summary>
         /// Додаткова інформація 
         /// </summary>
-        public string AdditionalInfo { get; set; }
+        public required string AdditionalInfo { get; set; }
 
         /// <summary>
         /// Час вивникнення помилки 
         /// <summary>
         public DateTime Time { get; set; }
-        public object Timestamp { get; set; }
+        public required object Timestamp { get; set; }
     }
 }

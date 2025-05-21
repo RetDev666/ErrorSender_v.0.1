@@ -9,7 +9,7 @@ namespace ErrSendApplication.DTO
     public class TelegramSettingsDto
     {
         public bool Enables { get; set; }
-        public string ChatId { get; set; }
-        public string BotName { get; set; }
+        public required string ChatId { get; set; }
+        public required string BotName { get; set; }
     }
 }

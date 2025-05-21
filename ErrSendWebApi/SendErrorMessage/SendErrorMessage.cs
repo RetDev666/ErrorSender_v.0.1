@@ -10,7 +10,7 @@ namespace ErrSendWebApi.SendErrorMessage
     {
         public class Command : IRequest<ExecutionStatus>
         {
-            public ErrorMessage ErrorMessage { get; set; }
+            public required ErrorMessage ErrorMessage { get; set; }
         }
 
         public class CommandValidator : AbstractValidator<Command>
@@ -32,8 +32,7 @@ namespace ErrSendWebApi.SendErrorMessage
             private readonly IErrorProcessor errorProcessor;
             private readonly ILogger<Handler> logger;
 
-            public Handler(TelegramBotService telegramBotService, ILogger<Handler> logger)
-            {
+            public Handler(
                 TelegramBotService telegramBotService,
                 IErrorProcessor errorProcessor,
                 ILogger<Handler> logger)
@@ -50,9 +49,17 @@ namespace ErrSendWebApi.SendErrorMessage
 
                 try
                 {
-                    // Валідуємо повідомлення
-                    var isValid = await errorProcessor.ValidateErrorMessageAsync(request.ErrorMessage);
-                    if (!isValid)
+                    if (request.ErrorMessage == null)
+                    {
+                        result.Status = "ER";
+                        result.Errors.Add("Повідомлення про помилку є null");
+                        result.ErrorCode = 400;
+                        return result;
+                    }
+
+                    // Валідуємо повідомлення через errorProcessor
+                    var validatedError = await errorProcessor.ValidateErrorMessageAsync(request.ErrorMessage);
+                    if (validatedError == null)
                     {
                         result.Status = "ER";
                         result.Errors.Add("Повідомлення про помилку не пройшло валідацію");
@@ -61,11 +68,11 @@ namespace ErrSendWebApi.SendErrorMessage
                     }
 
                     // Обробляємо помилку
-                    var processedError = await errorProcessor.ProcessErrorAsync(request.ErrorMessage);
+                    var processedError = await errorProcessor.ProcesssErrorAsync(request.ErrorMessage);
 
                     logger.LogInformation($"Початок відправки повідомлення про помилку: {processedError.Application}");
 
-                    var success = await telegramBotService.SendErrorMessageAsync(request.ErrorMessage);
+                    var success = await telegramBotService.SendErrorMessageAsync(processedError);
 
                     if (!success)
                     {

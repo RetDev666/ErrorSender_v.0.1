@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
 using Domain.Models;
 using ErrSendApplication.DTO;
-using ErrSendApplication.Features.Telegram;
+using ErrSendApplication.Authorization;
 using ErrSendWebApi.ModelsDto;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using SendErrorCmd = ErrSendWebApi.SendErrorMessage;
 
 namespace ErrSendWebApi.Controllers
 {
@@ -65,16 +66,16 @@ namespace ErrSendWebApi.Controllers
             var errorMessage = new ErrorMessage
             {
                 Application = request.Application,
-                Version = request.Version,
-                Environment = request.Environment,
+                Version = request.Version ?? string.Empty,
+                Environment = request.Environment ?? string.Empty,
                 Message = request.Message,
-                StackTrace = request.StackTrace,
-                AdditionalInfo = request.AdditionalInfo,
+                StackTrace = request.StackTrace ?? string.Empty,
+                AdditionalInfo = request.AdditionalInfo ?? string.Empty,
                 Time = request.Timestamp ?? DateTime.UtcNow,
                 Timestamp = request.Timestamp ?? DateTime.UtcNow
             };
 
-            var command = new SendErrorMessage.Command { ErrorMessage = errorMessage };
+            var command = new SendErrorCmd.SendErrorMessage.Command { ErrorMessage = errorMessage };
             var response = await Mediator.Send(command);
 
             if (response.Status == "ER")
@@ -108,10 +109,10 @@ namespace ErrSendWebApi.Controllers
             Tags = new[] { "Telegram" }
         )]
         [SwaggerResponse(StatusCodes.Status200OK, "Налаштування отримано", typeof(ApiResponse<TelegramSettingsDto>))]
-        public ActionResult<ApiResponse<TelegramSettingsDto>> GetSettings(
+        public async Task<ActionResult<ApiResponse<TelegramSettingsDto>>> GetSettings(
             [FromHeader(Name = "X-API-KEY")] string apiKey)
         {
-            if (!_authorizationService.ValidateApiKeyAsync(apiKey).Result)
+            if (!await _authorizationService.ValidateApiKeyAsync(apiKey))
             {
                 return Unauthorized(new ApiResponse<TelegramSettingsDto>
                 {
@@ -121,18 +122,27 @@ namespace ErrSendWebApi.Controllers
             }
 
             var configuration = HttpContext.RequestServices.GetService<IConfiguration>();
-            var settings = new TelegramSettingsDto
+            if (configuration != null)
             {
-                Enabled = configuration.GetValue<bool>("Telegram:Enabled"),
-                ChatId = configuration.GetValue<string>("Telegram:ChatId"),
-                BotName = configuration.GetValue<string>("Telegram:BotName", "ErrorSenderBot")
-            };
+                var settings = new TelegramSettingsDto
+                {
+                    Enables = configuration.GetValue<bool>("Telegram:Enabled"),
+                    ChatId = configuration.GetValue<string>("Telegram:ChatId") ?? string.Empty,
+                    BotName = configuration.GetValue<string>("Telegram:BotName") ?? "ErrorSenderBot"
+                };
 
-            return Ok(new ApiResponse<TelegramSettingsDto>
+                return Ok(new ApiResponse<TelegramSettingsDto>
+                {
+                    Success = true,
+                    Data = settings,
+                    Message = "Settings retrieved successfully"
+                });
+            }
+            
+            return StatusCode(500, new ApiResponse<TelegramSettingsDto>
             {
-                Success = true,
-                Data = settings,
-                Message = "Settings retrieved successfully"
+                Success = false,
+                Message = "Failed to retrieve configuration"
             });
         }
     }

@@ -16,8 +16,15 @@ namespace ErrSendPersistensTelegram
                              })
                             .ConfigureHttpClient(client =>
                             {
-                                client.BaseAddress = new Uri(configuration.GetValue<string>("serverUrl"));
+                                var serverUrl = configuration.GetValue<string>("serverUrl");
+                                if (!string.IsNullOrEmpty(serverUrl))
+                                {
+                                    client.BaseAddress = new Uri(serverUrl);
+                                }
                             });
+
+            // Реєстрація TelegramBotService
+            services.AddSingleton<TelegramBotService>();
 
             return services;
         }

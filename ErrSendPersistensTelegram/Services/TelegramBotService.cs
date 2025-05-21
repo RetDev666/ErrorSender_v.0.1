@@ -4,13 +4,15 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Requests;
+using Telegram.Bot.Types;
 
 namespace ErrSendPersistensTelegram.Services
 {
     public class TelegramBotService
     {
-        private readonly ITelegramBotClient botClient;
-        private readonly string chatId;
+        private readonly ITelegramBotClient? botClient;
+        private readonly string? chatId;
         private readonly ILogger<TelegramBotService> logger;
         private readonly bool enabled;
 
@@ -56,12 +58,14 @@ namespace ErrSendPersistensTelegram.Services
 
                 var message = FormatErrorMessage(error);
 
-
-                await botClient.SendTextMessageAsync(
-                    chatId: long.Parse(chatId), 
-                    text: message,
-                    parseMode: ParseMode.Html
-                );
+                if (botClient != null && !string.IsNullOrEmpty(chatId))
+                {
+                    await botClient.SendMessage(
+                        chatId: chatId, 
+                        text: message,
+                        parseMode: ParseMode.Html
+                    );
+                }
 
                 logger.LogInformation($"Повідомлення про помилку успішно відправлено: {error.Message}");
                 return true;

@@ -9,9 +9,9 @@ namespace ErrSendWebApi
         {
             Log.Logger = new LoggerConfiguration()
              .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-             .WriteTo.File("HybrisWebApi-.log", rollingInterval: RollingInterval.Day)
+             .WriteTo.File("ErrorSender-.log", rollingInterval: RollingInterval.Day)
              .CreateLogger();
-            //TODO: Структуа запуску має бути так, якщо необхідно буде підключити якийсь сервіс  ще.
+            // Р—Р°РїСѓСЃРєР°С”РјРѕ С…РѕСЃС‚С–РЅРі РІРµР±-Р·Р°СЃС‚РѕСЃСѓРЅРєСѓ
             var host = CreateHostBuilder(args).Build();
 
             host.Run();
@@ -22,8 +22,7 @@ namespace ErrSendWebApi
                 .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    //TODO: Поміняти на правильний порт подумати як із двома протоколами зробити.
-                    //webBuilder.UseUrls("http://localhost:5001", "https://localhost:5002");
+                    // РќР°Р»Р°С€С‚РѕРІСѓС”РјРѕ URL, СЏРєРёР№ РІРёРєРѕСЂРёСЃС‚РѕРІСѓРІР°С‚РёРјРµ РІРµР±-СЃРµСЂРІРµСЂ
                     webBuilder.UseUrls("http://localhost:5001");
                     webBuilder.UseStartup<Startup>();
                 });

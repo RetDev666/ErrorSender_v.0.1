@@ -51,37 +51,32 @@ namespace ErrSendApplication.Processes
             return await Task.FromResult(error);
         }
 
-        public Task<ErrorMessage> ProcesssErrorAsync(ErrorMessage error)
+        public async Task<ErrorMessage> ProcesssErrorAsync(ErrorMessage error)
         {
-            throw new NotImplementedException();
+            return await ProcessErrorAsync(error);
         }
 
-        public async Task<bool> ValidateErrorMessageAsync(ErrorMessage error)
+        public async Task<ErrorMessage> ValidateErrorMessageAsync(ErrorMessage error)
         {
             if (error == null)
             {
                 Logger.LogWarning("Error message is null");
-                return false;
+                return null;
             }
 
             if (string.IsNullOrEmpty(error.Application))
             {
                 Logger.LogWarning("Application name is required");
-                return false;
+                return null;
             }
 
             if (string.IsNullOrEmpty(error.Message))
             {
                 Logger.LogWarning("Error message is required");
-                return false;
+                return null;
             }
 
-            return await Task.FromResult(true);
-        }
-
-        Task<ErrorMessage> IErrorProcessor.ValidateErrorMessageAsync(ErrorMessage error)
-        {
-            throw new NotImplementedException();
+            return error;
         }
     }
 }

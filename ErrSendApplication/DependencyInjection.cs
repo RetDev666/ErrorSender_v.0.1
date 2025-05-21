@@ -1,5 +1,6 @@
 ﻿using ErrSendApplication.Authorization;
 using ErrSendApplication.Behaviors;
+using ErrSendApplication.Interfaces;
 using ErrSendApplication.Proceses;
 using ErrSendApplication.Processes;
 using FluentValidation;

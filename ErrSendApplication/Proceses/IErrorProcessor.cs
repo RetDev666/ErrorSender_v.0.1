@@ -9,6 +9,7 @@ namespace ErrSendApplication.Proceses
 {
     public interface IErrorProcessor
     {
+        Task<ErrorMessage> ProcessErrorAsync(ErrorMessage error);
         Task<ErrorMessage> ProcesssErrorAsync(ErrorMessage error);
         Task<ErrorMessage> ValidateErrorMessageAsync(ErrorMessage error);
     }

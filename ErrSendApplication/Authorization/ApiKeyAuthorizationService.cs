@@ -24,7 +24,10 @@ namespace ErrSendApplication.Authorization
             // Iterate through all elements in the section
             foreach (var child in apiKeysSection.GetChildren())
             {
-                validApiKeys.Add(child.Value);
+                if (!string.IsNullOrEmpty(child.Value))
+                {
+                    validApiKeys.Add(child.Value);
+                }
             }
 
             return Task.FromResult(validApiKeys.Contains(apiKey));

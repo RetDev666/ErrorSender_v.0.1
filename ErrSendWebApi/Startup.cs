@@ -1,14 +1,21 @@
 ﻿using ErrSendApplication;
+using ErrSendApplication.Common.Configs;
 using ErrSendApplication.Interfaces;
 using ErrSendApplication.Mappings;
 using ErrSendPersistensTelegram;
 using ErrSendWebApi.ExceptionMidlevare;
+using ErrSendWebApi.Extensions;
+using ErrSendWebApi.Helpers;
 using ErrSendWebApi.Middleware.Culture;
 using ErrSendWebApi.Serviсe;
 using ErrSendWebApi.TimeZone;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using System.Text;
+using MediatR;
 
 namespace ErrSendWebApi
 {
@@ -24,7 +31,7 @@ namespace ErrSendWebApi
         public void ConfigureServices(IServiceCollection services)
         {
             //Файли конфігів
-            //services.Configure<TokenCfg>(Configuration.GetSection("JWT"));
+            services.Configure<TokenCfg>(Configuration.GetSection("JWT"));
 
             //Додаємо профілі зборок в ДІ конвеєр через автомапер.
             services.AddAutoMapper(config =>
@@ -36,9 +43,13 @@ namespace ErrSendWebApi
             //Підключаємо зборки в ДІ через Медіатр
             services.AddApplication(Configuration);
             services.AddPersistenceTelegram(Configuration);
+            
+            // Реєструємо MediatR для збірки ErrSendWebApi
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
+            
             services.AddControllers();
             
-            /*Дописати
+            // Налаштування JWT автентифікації
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -54,9 +65,9 @@ namespace ErrSendWebApi
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = "ErrSendWebApi",
                     ValidAudience = "https://localhost:5001",
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(PassHelper.Decrypt(Configuration.GetSection("JWT:TokenKey").Value, "HEnglish")))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:TokenKey"]))
                 };
-            });*/
+            });
 
             //Політика підключення із всіх а не тільки через ІдентітіСрв не працювало б якщо ми б спробували із 1с наприклад підключитись.
             services.AddCors(options =>
@@ -71,9 +82,25 @@ namespace ErrSendWebApi
             //services.ConfigureJwt(Configuration);
             services.AddSwaggerGen(c =>
             {
-                var xmlFile = $"{Assembly.GetEntryAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
+                // Налаштування XML документації
+                try
+                {
+                    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                    
+                    if (File.Exists(xmlPath))
+                    {
+                        c.IncludeXmlComments(xmlPath);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"XML документація не знайдена за шляхом: {xmlPath}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Помилка налаштування XML документації: {ex.Message}");
+                }
 
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
@@ -114,7 +141,7 @@ namespace ErrSendWebApi
             });
 
             //TODO: Зробити коли підключатимемо токени
-            //services.AddPersistenceToken(Configuration);
+            services.AddPersistenceToken(Configuration);
             services.AddSingleton<ICurrentService, CurrentService>();
             services.AddHttpContextAccessor();
         }
@@ -140,7 +167,6 @@ namespace ErrSendWebApi
             {
                 config.RoutePrefix = string.Empty;
                 config.SwaggerEndpoint("swagger/v1/swagger.json", "HybrisWebApi.Api");
-                config.InjectStylesheet("/swagger/Ui/theme-feeling-blue.css");
             });
 
             app.UseCustomExceptionHandler();

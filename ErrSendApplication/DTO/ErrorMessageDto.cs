@@ -11,14 +11,14 @@ namespace ErrSendApplication.DTO
 {
     public class ErrorMessageDto : IMapWith<ErrorMessage>
     {
-        public string Application { get; set; }
-        public string Version { get; set; }
-        public string Environment { get; set; }
-        public string Message { get; set; }
-        public string StackTrace { get; set; }
-        public string AdditionalData { get; set; }
+        public required string Application { get; set; }
+        public required string Version { get; set; }
+        public required string Environment { get; set; }
+        public required string Message { get; set; }
+        public required string StackTrace { get; set; }
+        public required string AdditionalData { get; set; }
         public DateTime Time { get; set; }
-        public object Timestamp { get; private set; }
+        public required object Timestamp { get; set; }
 
         public void Mapping (Profile profile)
         {
